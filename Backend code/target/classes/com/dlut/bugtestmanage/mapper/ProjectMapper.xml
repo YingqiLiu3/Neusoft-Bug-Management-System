@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dlut.bugtestmanage.mapper.ProjectMapper">
+    <select id="findProjectsListByUserName" resultType="com.dlut.bugtestmanage.entity.Project">
+        SELECT p.project_id, p.project_name, p.project_description, p.project_created_by, p.project_created_time, p.project_status
+        FROM sys_user u
+                 LEFT JOIN user_project up ON u.user_id = up.user_id
+                 LEFT JOIN test_project p ON up.project_id = p.project_id
+        WHERE u.username = #{arg0}
+          AND (
+            #{arg1} = '项目经理' OR
+            (#{arg1} IN ('测试工程师', '开发工程师') AND p.project_status = 1)
+            )
+    </select>
+
+    <select id="findProjectsListByQuery" resultType="com.dlut.bugtestmanage.entity.Project">
+        SELECT p.project_id, p.project_name, p.project_description, p.project_created_by, p.project_created_time, p.project_status
+        FROM sys_user u
+                 LEFT JOIN user_project up ON u.user_id = up.user_id
+                 LEFT JOIN test_project p ON up.project_id = p.project_id
+        WHERE u.username = #{arg0}
+          AND (
+            #{arg1} = '项目经理' OR
+            (#{arg1} IN ('测试工程师', '开发工程师') AND p.project_status = 1)
+            )
+          AND (p.project_name LIKE CONCAT('%', #{arg2}, '%')
+            OR p.project_description LIKE CONCAT('%', #{arg2}, '%'))
+    </select>
+</mapper>
